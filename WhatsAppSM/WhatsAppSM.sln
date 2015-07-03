@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatsAppSM", "WhatsAppSM\WhatsAppSM.csproj", "{1B9C6D86-26C5-4DE4-8AE7-7E5DCB0F187B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSMQ", "MSMQ\MSMQ.csproj", "{16A7E9D8-F417-4B3A-9392-7AD983D7FF10}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B9C6D86-26C5-4DE4-8AE7-7E5DCB0F187B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B9C6D86-26C5-4DE4-8AE7-7E5DCB0F187B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B9C6D86-26C5-4DE4-8AE7-7E5DCB0F187B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B9C6D86-26C5-4DE4-8AE7-7E5DCB0F187B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16A7E9D8-F417-4B3A-9392-7AD983D7FF10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16A7E9D8-F417-4B3A-9392-7AD983D7FF10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16A7E9D8-F417-4B3A-9392-7AD983D7FF10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16A7E9D8-F417-4B3A-9392-7AD983D7FF10}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
