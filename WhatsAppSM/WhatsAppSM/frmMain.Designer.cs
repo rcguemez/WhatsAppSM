@@ -1,6 +1,6 @@
 ﻿namespace WhatsAppSM
 {
-    partial class Form1
+    partial class frmMain
     {
         /// <summary>
         /// Variable del diseñador requerida.
