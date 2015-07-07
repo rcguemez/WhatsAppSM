@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatsAppSM", "WhatsAppSM\Wh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSMQ", "MSMQ\MSMQ.csproj", "{16A7E9D8-F417-4B3A-9392-7AD983D7FF10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManager.WhatsApp", "SchoolManager.WhatsApp\SchoolManager.WhatsApp.csproj", "{4406D685-7CB8-4167-A862-6CBFC4F88F79}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{16A7E9D8-F417-4B3A-9392-7AD983D7FF10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16A7E9D8-F417-4B3A-9392-7AD983D7FF10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16A7E9D8-F417-4B3A-9392-7AD983D7FF10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4406D685-7CB8-4167-A862-6CBFC4F88F79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4406D685-7CB8-4167-A862-6CBFC4F88F79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4406D685-7CB8-4167-A862-6CBFC4F88F79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4406D685-7CB8-4167-A862-6CBFC4F88F79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
