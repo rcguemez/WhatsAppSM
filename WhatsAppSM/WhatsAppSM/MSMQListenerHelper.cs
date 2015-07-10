@@ -169,14 +169,10 @@ namespace WhatsAppSM
             recurso = strArr[3];
             
             SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusEnviando(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio);
-
-            WhatsUserManager usrMan = new WhatsUserManager();
-            var tmpUser = usrMan.CreateUser(receptor, "User");
-            wa.SendMessage(tmpUser.GetFullJid(), e.Message.Body.ToString());
-            
+            wa.SendMessage(receptor, e.Message.Body.ToString());
+            System.Threading.Thread.Sleep(100);
             System.Messaging.Message msg = _queue.EndReceive(e.AsyncResult);
             FireRecieveEvent(msg);
-            System.Threading.Thread.Sleep(200);
             StartListening();
         }
 
