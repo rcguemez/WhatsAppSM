@@ -64,17 +64,19 @@ namespace WhatsAppSM
             }
         }
 
-        System.Threading.Thread thRecv; 
+        System.Threading.Thread thRecv;
+        byte[] nextChallenge = null;
+        DateTime dtUltimaConexion;
         public void Start()
         {
             _listen = true;
             listaEmisores_UsuariosEN = SchoolManager.WhatsApp.LogicaNegocios.Emisores_UsuariosLN.ObtenerPorUsuario(Usuario);
             listaEmisoresEN = SchoolManager.WhatsApp.LogicaNegocios.EmisoresLN.ObtenerPorEmisor(listaEmisores_UsuariosEN[0].EMISOR);
             wa = new WhatsApp(listaEmisores_UsuariosEN[0].EMISOR, listaEmisoresEN[0].APIKEY, listaEmisores_UsuariosEN[0].NOMBREPERFIL, true);
+            dtUltimaConexion = DateTime.Now;
             wa.Connect();
             wa.Login();
             //string datFile = getDatFileName(listaEmisores_UsuariosEN[0].EMISOR);
-            //byte[] nextChallenge = null;
             //if (File.Exists(datFile))
             //{
             //    try
@@ -170,52 +172,65 @@ namespace WhatsAppSM
 
         private void FireRecieveEvent(System.Messaging.Message pMensaje)
         {
-            if (MessageReceived != null)
-            {
-                MessageReceived(this, new MessageEventArgs(pMensaje));
-            }
+            //if (MessageReceived != null)
+            //{
+            //    MessageReceived(this, new MessageEventArgs(pMensaje));
+            //}
         }
 
         private void OnReceiveCompleted(object sender, ReceiveCompletedEventArgs e)
         {
-            string[] strArr = null;
-            char[] splitchar = { '|' };
-            strArr = e.Message.Label.Split(splitchar);
-            string folio, receptor, recurso;
-            folio = strArr[0];
-            receptor = strArr[1];
-            recurso = strArr[2];
-
-            SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusListoParaEnviar(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "");
-            //wa.SendMessage(receptor, e.Message.Body.ToString());
-
             try
             {
-                WhatsUserManager usrMan = new WhatsUserManager();
-                var tmpUser = usrMan.CreateUser(receptor, "User" + receptor);
-                WhatsAppApi.Parser.FMessage.FMessageIdentifierKey key = new WhatsAppApi.Parser.FMessage.FMessageIdentifierKey(tmpUser.GetFullJid(), true, folio);
-                WhatsAppApi.Parser.FMessage msj = new WhatsAppApi.Parser.FMessage(key);
-                msj.data = e.Message.Body.ToString();
-                wa.Connect();
-                wa.Login();
-                if (wa.ConnectionStatus == ApiBase.CONNECTION_STATUS.UNAUTHORIZED)
+                System.Messaging.Message msg = _queue.EndReceive(e.AsyncResult);
+                FireRecieveEvent(msg);
+                string[] strArr = null;
+                char[] splitchar = { '|' };
+                strArr = e.Message.Label.Split(splitchar);
+                string folio, receptor, recurso;
+                folio = strArr[0];
+                receptor = strArr[1];
+                recurso = strArr[2];
+
+                SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusListoParaEnviar(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "");
+                //wa.SendMessage(receptor, e.Message.Body.ToString());
+
+                try
                 {
-                    this.Stop();
-                    SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusErrorEnvio(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "No Autorizado para enviar");
+                    WhatsUserManager usrMan = new WhatsUserManager();
+                    var tmpUser = usrMan.CreateUser(receptor, "User" + receptor);
+                    WhatsAppApi.Parser.FMessage.FMessageIdentifierKey key = new WhatsAppApi.Parser.FMessage.FMessageIdentifierKey(tmpUser.GetFullJid(), true, folio);
+                    WhatsAppApi.Parser.FMessage msj = new WhatsAppApi.Parser.FMessage(key);
+                    msj.data = e.Message.Body.ToString();
+                    if(dtUltimaConexion.AddMinutes(1) < DateTime.Now)
+                    {
+                        wa.Connect();
+                        wa.Login();
+                    }
+                    dtUltimaConexion = DateTime.Now;
+                    if (wa.ConnectionStatus == ApiBase.CONNECTION_STATUS.UNAUTHORIZED)
+                    {
+                        SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusErrorEnvio(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "No Autorizado para enviar");
+                        this.Stop();
+                        return;
+                    }
+                    wa.SendMessage(msj);
+                    Random objRandom = new Random();
+                    System.Threading.Thread.Sleep(objRandom.Next(1000, 1500));
+                }
+                catch (Exception ex)
+                {
+                    SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusErrorEnvio(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "Error al enviar: " + ex.Message);
                     return;
                 }
-                wa.SendMessage(msj);
-                System.Threading.Thread.Sleep(100);
+                SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusEnviando(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "");
+                StartListening();
             }
             catch(Exception ex)
             {
-                SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusErrorEnvio(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "Error al enviar: " + ex.Message);
-                return;
+                this.Stop();
+                System.Windows.Forms.MessageBox.Show(ex.Message);
             }
-            SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusEnviando(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "");
-            System.Messaging.Message msg = _queue.EndReceive(e.AsyncResult);
-            FireRecieveEvent(msg);
-            StartListening();
         }
 
         private string getDatFileName(string pn)

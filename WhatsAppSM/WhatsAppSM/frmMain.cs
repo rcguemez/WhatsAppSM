@@ -30,13 +30,12 @@ namespace WhatsAppSM
                     listaMLH.Add(new MSMQListenerHelper(queueItem.QueueName));
                     listaMLH[listaMLH.Count - 1].FormatterTypes = new Type[] { typeof(string) };
                     listaMLH[listaMLH.Count - 1].MessageReceived += new MessageReceivedEventHandler(MessageReceived);
-                    listaMLH[listaMLH.Count - 1].Start();
                 }
             }
         }
         private void MessageReceived(object sender, MessageEventArgs e)
         {
-            SetControlPropertyValue(this, "Text", ".\\" + ((MSMQListenerHelper)sender).Cola + ": " + e.Mensaje.Label);
+            //SetControlPropertyValue(this, "Text", ".\\" + ((MSMQListenerHelper)sender).Cola + ": " + e.Mensaje.Label);
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -69,6 +68,22 @@ namespace WhatsAppSM
                         p.SetValue(pControl, pValue, null);
                     }
                 }
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            for(int i = 0; i<listaMLH.Count;i++)
+            {
+                listaMLH[i].Start();
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < listaMLH.Count; i++)
+            {
+                listaMLH[i].Stop();
             }
         }
     }

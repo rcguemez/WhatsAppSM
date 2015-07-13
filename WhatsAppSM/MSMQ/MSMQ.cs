@@ -61,39 +61,42 @@ namespace MSMQ
             this.txtRespuesta.Text = "";
             Mensajes mensaje = new Mensajes() { Usuario = this.cmbUsuarios.Text, Password = "1234", CodigoPais = "521", Celular = this.txtCelular.Text, Mensaje = this.txtMensaje.Text, Prioridad = this.cmbTipo.SelectedIndex };
             RunAsync(mensaje).Wait(100);
-            MessageBox.Show(this.txtRespuesta.Text);
         }
 
         async Task RunAsync(Mensajes pMensaje)
         {
-            try
+            for (int i = 1; i <= 100;i++ )
             {
-                using (var client = new HttpClient())
+                try
                 {
-                    client.BaseAddress = new Uri("http://localhost:3395/");
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                    HttpResponseMessage response;
-                    // HTTP POST
-                    response = await client.PostAsJsonAsync("api/mensajes", pMensaje);
-                    if (response.IsSuccessStatusCode)
+                    pMensaje.Mensaje = "test" + i.ToString();
+                    using (var client = new HttpClient())
                     {
-                        string[] respuesta = await response.Content.ReadAsAsync<string[]>();
-                        foreach (string res in respuesta)
+                        client.BaseAddress = new Uri("http://localhost:3395/");
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        HttpResponseMessage response;
+                        // HTTP POST
+                        response = await client.PostAsJsonAsync("api/mensajes", pMensaje);
+                        if (response.IsSuccessStatusCode)
                         {
-                            this.txtRespuesta.AppendText(res + Environment.NewLine);
+                            string[] respuesta = await response.Content.ReadAsAsync<string[]>();
+                            foreach (string res in respuesta)
+                            {
+                                this.txtRespuesta.AppendText(res + Environment.NewLine);
+                            }
+                        }
+                        else
+                        {
+                            this.txtRespuesta.Text = "False|Error al enviar mensaje";
                         }
                     }
-                    else
-                    {
-                        this.txtRespuesta.Text = "False|Error al enviar mensaje";
-                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                this.txtRespuesta.Text = "False|" + ex.Message;
+                catch (Exception ex)
+                {
+                    this.txtRespuesta.Text = "False|" + ex.Message;
+                }
             }
         }
 
