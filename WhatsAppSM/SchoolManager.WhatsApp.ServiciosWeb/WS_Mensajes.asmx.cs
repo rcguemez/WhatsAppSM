@@ -21,10 +21,6 @@ namespace SchoolManager.WhatsApp.ServiciosWeb
         {
             try
             {
-                if (pMensaje.NombrePerfil.Trim() == "")
-                {
-                    pMensaje.NombrePerfil = pMensaje.Usuario;
-                }
                 if (pMensaje.CodigoPais.Trim() == "")
                 {
                     pMensaje.CodigoPais = "521";
@@ -40,7 +36,7 @@ namespace SchoolManager.WhatsApp.ServiciosWeb
                 }
                 if (SchoolManager.WhatsApp.LogicaNegocios.UsuariosLN.IniciarSesion(pMensaje.Usuario, pMensaje.Password))
                 {
-                    return SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.AgregarEnCola(pMensaje.Usuario, pMensaje.NombrePerfil, pMensaje.CodigoPais, pMensaje.Celular, 0, pMensaje.Mensaje, pMensaje.Prioridad);
+                    return SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.AgregarEnCola(pMensaje.Usuario, pMensaje.CodigoPais, pMensaje.Celular, 0, pMensaje.Mensaje, pMensaje.Prioridad);
                 }
                 else
                 {
@@ -58,7 +54,6 @@ namespace SchoolManager.WhatsApp.ServiciosWeb
     {
         public string Usuario { get; set; }
         public string Password { get; set; }
-        public string NombrePerfil { get; set; }
         public string CodigoPais { get; set; }
         public string Celular { get; set; }
         public string Mensaje { get; set; }

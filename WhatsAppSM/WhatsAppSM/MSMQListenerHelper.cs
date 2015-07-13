@@ -64,27 +64,46 @@ namespace WhatsAppSM
             }
         }
 
+        System.Threading.Thread thRecv; 
         public void Start()
         {
             _listen = true;
             listaEmisores_UsuariosEN = SchoolManager.WhatsApp.LogicaNegocios.Emisores_UsuariosLN.ObtenerPorUsuario(Usuario);
             listaEmisoresEN = SchoolManager.WhatsApp.LogicaNegocios.EmisoresLN.ObtenerPorEmisor(listaEmisores_UsuariosEN[0].EMISOR);
-            wa = new WhatsApp(listaEmisores_UsuariosEN[0].EMISOR, listaEmisoresEN[0].APIKEY, "SisteMexico", true);
+            wa = new WhatsApp(listaEmisores_UsuariosEN[0].EMISOR, listaEmisoresEN[0].APIKEY, listaEmisores_UsuariosEN[0].NOMBREPERFIL, true);
             wa.Connect();
-            string datFile = getDatFileName(listaEmisores_UsuariosEN[0].EMISOR);
-            byte[] nextChallenge = null;
-            if (File.Exists(datFile))
-            {
-                try
-                {
-                    string foo = File.ReadAllText(datFile);
-                    nextChallenge = Convert.FromBase64String(foo);
-                }
-                catch (Exception) { };
-            }
+            wa.Login();
+            //string datFile = getDatFileName(listaEmisores_UsuariosEN[0].EMISOR);
+            //byte[] nextChallenge = null;
+            //if (File.Exists(datFile))
+            //{
+            //    try
+            //    {
+            //        string foo = File.ReadAllText(datFile);
+            //        nextChallenge = Convert.FromBase64String(foo);
+            //    }
+            //    catch (Exception) { };
+            //}
+            //wa.Login(nextChallenge);
+            //wa.SendGetServerProperties();
 
-            wa.Login(nextChallenge);
-            wa.SendGetServerProperties();
+            //thRecv = new System.Threading.Thread(t =>
+            //{
+            //    try
+            //    {
+            //        while (wa != null)
+            //        {
+            //            wa.PollMessages();
+            //            System.Threading.Thread.Sleep(100);
+            //            continue;
+            //        }
+
+            //    }
+            //    catch (System.Threading.ThreadAbortException)
+            //    {
+            //    }
+            //}) { IsBackground = true };
+            //thRecv.Start();
 
             if (_types != null && _types.Length > 0)
             {
@@ -162,15 +181,38 @@ namespace WhatsAppSM
             string[] strArr = null;
             char[] splitchar = { '|' };
             strArr = e.Message.Label.Split(splitchar);
-            string folio, nombrePerfil, receptor, recurso;
+            string folio, receptor, recurso;
             folio = strArr[0];
-            nombrePerfil = strArr[1];
-            receptor = strArr[2];
-            recurso = strArr[3];
-            
-            SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusEnviando(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio);
-            wa.SendMessage(receptor, e.Message.Body.ToString());
-            System.Threading.Thread.Sleep(100);
+            receptor = strArr[1];
+            recurso = strArr[2];
+
+            SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusListoParaEnviar(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "");
+            //wa.SendMessage(receptor, e.Message.Body.ToString());
+
+            try
+            {
+                WhatsUserManager usrMan = new WhatsUserManager();
+                var tmpUser = usrMan.CreateUser(receptor, "User" + receptor);
+                WhatsAppApi.Parser.FMessage.FMessageIdentifierKey key = new WhatsAppApi.Parser.FMessage.FMessageIdentifierKey(tmpUser.GetFullJid(), true, folio);
+                WhatsAppApi.Parser.FMessage msj = new WhatsAppApi.Parser.FMessage(key);
+                msj.data = e.Message.Body.ToString();
+                wa.Connect();
+                wa.Login();
+                if (wa.ConnectionStatus == ApiBase.CONNECTION_STATUS.UNAUTHORIZED)
+                {
+                    this.Stop();
+                    SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusErrorEnvio(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "No Autorizado para enviar");
+                    return;
+                }
+                wa.SendMessage(msj);
+                System.Threading.Thread.Sleep(100);
+            }
+            catch(Exception ex)
+            {
+                SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusErrorEnvio(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "Error al enviar: " + ex.Message);
+                return;
+            }
+            SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusEnviando(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "");
             System.Messaging.Message msg = _queue.EndReceive(e.AsyncResult);
             FireRecieveEvent(msg);
             StartListening();
