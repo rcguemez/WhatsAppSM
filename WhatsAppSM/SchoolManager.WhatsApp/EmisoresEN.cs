@@ -41,5 +41,23 @@ namespace SchoolManager.WhatsApp.Entidades
             get { return _activo; }
             set { _activo = value; }
         }
+        private string _nombrePerfil;
+        public string NOMBREPERFIL
+        {
+            get { return _nombrePerfil; }
+            set { _nombrePerfil = value; }
+        }
+        private string _imagenPerfil;
+        public string IMAGENPERFIL
+        {
+            get { return _imagenPerfil; }
+            set { _imagenPerfil = value; }
+        }
+        private string _estado;
+        public string ESTADO
+        {
+            get { return _estado; }
+            set { _estado = value; }
+        }
     }
 }

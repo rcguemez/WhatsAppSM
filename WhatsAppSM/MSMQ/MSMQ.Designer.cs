@@ -40,6 +40,10 @@
             this.txtRespuesta = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.btnNuevo = new System.Windows.Forms.Button();
+            this.btnEnviarASMX = new System.Windows.Forms.Button();
+            this.numMensajes = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.numMensajes)).BeginInit();
             this.SuspendLayout();
             // 
             // cmbUsuarios
@@ -67,16 +71,16 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtCelular.Location = new System.Drawing.Point(72, 77);
             this.txtCelular.Name = "txtCelular";
-            this.txtCelular.Size = new System.Drawing.Size(203, 20);
+            this.txtCelular.Size = new System.Drawing.Size(503, 20);
             this.txtCelular.TabIndex = 2;
             // 
             // btnEnviar
             // 
-            this.btnEnviar.Location = new System.Drawing.Point(94, 159);
+            this.btnEnviar.Location = new System.Drawing.Point(278, 159);
             this.btnEnviar.Name = "btnEnviar";
-            this.btnEnviar.Size = new System.Drawing.Size(75, 23);
+            this.btnEnviar.Size = new System.Drawing.Size(100, 23);
             this.btnEnviar.TabIndex = 3;
-            this.btnEnviar.Text = "Enviar";
+            this.btnEnviar.Text = "Enviar (API Web)";
             this.btnEnviar.UseVisualStyleBackColor = true;
             this.btnEnviar.Click += new System.EventHandler(this.btnEnviar_Click);
             // 
@@ -105,7 +109,7 @@
             this.txtMensaje.Location = new System.Drawing.Point(72, 103);
             this.txtMensaje.Multiline = true;
             this.txtMensaje.Name = "txtMensaje";
-            this.txtMensaje.Size = new System.Drawing.Size(203, 50);
+            this.txtMensaje.Size = new System.Drawing.Size(503, 50);
             this.txtMensaje.TabIndex = 6;
             // 
             // label4
@@ -137,7 +141,7 @@
             this.txtRespuesta.Location = new System.Drawing.Point(72, 188);
             this.txtRespuesta.Multiline = true;
             this.txtRespuesta.Name = "txtRespuesta";
-            this.txtRespuesta.Size = new System.Drawing.Size(203, 61);
+            this.txtRespuesta.Size = new System.Drawing.Size(503, 161);
             this.txtRespuesta.TabIndex = 10;
             // 
             // label5
@@ -151,19 +155,64 @@
             // 
             // btnNuevo
             // 
-            this.btnNuevo.Location = new System.Drawing.Point(175, 159);
+            this.btnNuevo.Location = new System.Drawing.Point(490, 159);
             this.btnNuevo.Name = "btnNuevo";
-            this.btnNuevo.Size = new System.Drawing.Size(75, 23);
+            this.btnNuevo.Size = new System.Drawing.Size(85, 23);
             this.btnNuevo.TabIndex = 11;
             this.btnNuevo.Text = "Nuevo";
             this.btnNuevo.UseVisualStyleBackColor = true;
             this.btnNuevo.Click += new System.EventHandler(this.btnNuevo_Click);
             // 
+            // btnEnviarASMX
+            // 
+            this.btnEnviarASMX.Location = new System.Drawing.Point(384, 159);
+            this.btnEnviarASMX.Name = "btnEnviarASMX";
+            this.btnEnviarASMX.Size = new System.Drawing.Size(100, 23);
+            this.btnEnviarASMX.TabIndex = 12;
+            this.btnEnviarASMX.Text = "Enviar (ASMX)";
+            this.btnEnviarASMX.UseVisualStyleBackColor = true;
+            this.btnEnviarASMX.Click += new System.EventHandler(this.btnEnviarASMX_Click);
+            // 
+            // numMensajes
+            // 
+            this.numMensajes.Location = new System.Drawing.Point(223, 161);
+            this.numMensajes.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numMensajes.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numMensajes.Name = "numMensajes";
+            this.numMensajes.Size = new System.Drawing.Size(49, 20);
+            this.numMensajes.TabIndex = 13;
+            this.numMensajes.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.numMensajes.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(110, 164);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(110, 13);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "Número de Mensajes:";
+            // 
             // MSMQ
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(584, 361);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.numMensajes);
+            this.Controls.Add(this.btnEnviarASMX);
             this.Controls.Add(this.btnNuevo);
             this.Controls.Add(this.txtRespuesta);
             this.Controls.Add(this.label5);
@@ -178,6 +227,7 @@
             this.Controls.Add(this.cmbUsuarios);
             this.Name = "MSMQ";
             this.Text = "Envío de WhatsApp";
+            ((System.ComponentModel.ISupportInitialize)(this.numMensajes)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -197,6 +247,9 @@
         private System.Windows.Forms.TextBox txtRespuesta;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button btnNuevo;
+        private System.Windows.Forms.Button btnEnviarASMX;
+        private System.Windows.Forms.NumericUpDown numMensajes;
+        private System.Windows.Forms.Label label6;
     }
 }
 

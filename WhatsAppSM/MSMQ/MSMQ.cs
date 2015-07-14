@@ -13,15 +13,6 @@ using System.Net.Http.Headers;
 
 namespace MSMQ
 {
-    public class Mensajes
-    {
-        public string Usuario { get; set; }
-        public string Password { get; set; }
-        public string CodigoPais { get; set; }
-        public string Celular { get; set; }
-        public string Mensaje { get; set; }
-        public int Prioridad { get; set; }
-    }
     public partial class MSMQ : Form
     {
         System.Messaging.MessageQueue mq;
@@ -59,20 +50,21 @@ namespace MSMQ
         private void btnEnviar_Click(object sender, EventArgs e)
         {
             this.txtRespuesta.Text = "";
-            Mensajes mensaje = new Mensajes() { Usuario = this.cmbUsuarios.Text, Password = "1234", CodigoPais = "521", Celular = this.txtCelular.Text, Mensaje = this.txtMensaje.Text, Prioridad = this.cmbTipo.SelectedIndex };
-            RunAsync(mensaje).Wait(100);
+            Mensajes objMensaje = new Mensajes() { Usuario = this.cmbUsuarios.Text, Password = "1234", CodigoPais = "521", Celular = this.txtCelular.Text, Mensaje = this.txtMensaje.Text, Prioridad = this.cmbTipo.SelectedIndex };
+            RunAsync(objMensaje).Wait(100);
         }
 
         async Task RunAsync(Mensajes pMensaje)
         {
-            for (int i = 1; i <= 100;i++ )
+            string mensaje = pMensaje.Mensaje;
+            for (int i = 1; i <= numMensajes.Value;i++ )
             {
                 try
                 {
-                    pMensaje.Mensaje = "test" + i.ToString();
+                    pMensaje.Mensaje = i.ToString() + " - " + mensaje;
                     using (var client = new HttpClient())
                     {
-                        client.BaseAddress = new Uri("http://localhost:3395/");
+                        client.BaseAddress = new Uri(System.Configuration.ConfigurationManager.AppSettings.Get("URL_WEP_API"));
                         client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -110,5 +102,40 @@ namespace MSMQ
         {
             
         }
+
+        private void btnEnviarASMX_Click(object sender, EventArgs e)
+        {
+            this.txtRespuesta.Text = "";
+            SchoolManager.WhatsApp.ServiciosWeb.WS_Mensajes.Mensajes objMensaje = new SchoolManager.WhatsApp.ServiciosWeb.WS_Mensajes.Mensajes() { Usuario = this.cmbUsuarios.Text, Password = "1234", CodigoPais = "521", Celular = this.txtCelular.Text, Mensaje = this.txtMensaje.Text, Prioridad = this.cmbTipo.SelectedIndex };
+            string mensaje = objMensaje.Mensaje;
+            for (int i = 1; i <= numMensajes.Value; i++)
+            {
+                try
+                {
+                    objMensaje.Mensaje = i.ToString() + " - " + mensaje;
+                    using(SchoolManager.WhatsApp.ServiciosWeb.WS_Mensajes.WS_MensajesSoapClient objWS = new SchoolManager.WhatsApp.ServiciosWeb.WS_Mensajes.WS_MensajesSoapClient())
+                    {
+                        SchoolManager.WhatsApp.ServiciosWeb.WS_Mensajes.ArrayOfString respuesta = objWS.Enviar(objMensaje);
+                        foreach (string res in respuesta)
+                        {
+                            this.txtRespuesta.AppendText(res + Environment.NewLine);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.txtRespuesta.Text = "False|" + ex.Message;
+                }
+            }
+        }
+    }
+    public class Mensajes
+    {
+        public string Usuario { get; set; }
+        public string Password { get; set; }
+        public string CodigoPais { get; set; }
+        public string Celular { get; set; }
+        public string Mensaje { get; set; }
+        public int Prioridad { get; set; }
     }
 }

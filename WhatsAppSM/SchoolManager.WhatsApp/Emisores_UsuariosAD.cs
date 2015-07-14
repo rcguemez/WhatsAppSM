@@ -18,12 +18,11 @@ namespace SchoolManager.WhatsApp.AccesoDatos
             {
                 _objContextoAD.Conexion.Open();
             }
-            string sql = "INSERT INTO EMISORES_USUARIOS (EMISOR,USUARIO,NOMBREPERFIL) " +
-                        "VALUES (@EMISOR,@USUARIO,@NOMBREPERFIL)";
+            string sql = "INSERT INTO EMISORES_USUARIOS (EMISOR,USUARIO) " +
+                        "VALUES (@EMISOR,@USUARIO)";
             FbCommand cmd = new FbCommand(sql, _objContextoAD.Conexion);
             cmd.Parameters.AddWithValue("@EMISOR", pObjEmisores_UsuariosEN.EMISOR);
             cmd.Parameters.AddWithValue("@USUARIO", pObjEmisores_UsuariosEN.USUARIO.ToLower());
-            cmd.Parameters.AddWithValue("@NOMBREPERFIL", pObjEmisores_UsuariosEN.USUARIO.ToLower());
             try
             {
                 if (_objContextoAD.EsTransaccion)
@@ -50,13 +49,11 @@ namespace SchoolManager.WhatsApp.AccesoDatos
             {
                 _objContextoAD.Conexion.Open();
             }
-            string sql = "UPDATE EMISORES_USUARIOS SET EMISOR = @EMISOR," +
-                                                "NOMBREPERFIL = @NOMBREPERFIL " +
+            string sql = "UPDATE EMISORES_USUARIOS SET EMISOR = @EMISOR " +
                                                 "WHERE USUARIO = @USUARIO";
             FbCommand cmd = new FbCommand(sql, _objContextoAD.Conexion);
             cmd.Parameters.AddWithValue("@EMISOR", pObjEmisores_UsuariosEN.EMISOR);
             cmd.Parameters.AddWithValue("@USUARIO", pObjEmisores_UsuariosEN.USUARIO.ToLower());
-            cmd.Parameters.AddWithValue("@NOMBREPERFIL", pObjEmisores_UsuariosEN.USUARIO.ToLower());
             try
             {
                 if (_objContextoAD.EsTransaccion)
@@ -129,13 +126,30 @@ namespace SchoolManager.WhatsApp.AccesoDatos
             }
             return CargarDatos(cmd.ExecuteReader());
         }
+        public DataTable DtEmisorActivoPorUsuario(string pUsuario, int pPrioridad)
+        {
+            DataTable tabla = new DataTable();
+            if (_objContextoAD.Conexion.State == ConnectionState.Closed)
+            {
+                _objContextoAD.Conexion.Open();
+            }
+            string sql = "SELECT EU.EMISOR,EU.USUARIO,E.PRIORIDAD,E.APIKEY,E.TIPO,E.NOMBREPERFIL,E.IMAGENPERFIL,E.ESTADO FROM EMISORES_USUARIOS EU INNER JOIN EMISORES E ON EU.EMISOR = E.EMISOR WHERE EU.USUARIO = @USUARIO AND E.PRIORIDAD = @PRIORIDAD AND E.ACTIVO = 1";
+            FbDataAdapter adapter = new FbDataAdapter(sql, _objContextoAD.Conexion);
+            adapter.SelectCommand.Parameters.AddWithValue("@USUARIO", pUsuario.ToLower());
+            adapter.SelectCommand.Parameters.AddWithValue("@PRIORIDAD", pPrioridad);
+            if (_objContextoAD.EsTransaccion)
+            {
+                adapter.SelectCommand.Transaction = _objContextoAD.Transaccion;
+            }
+            adapter.Fill(tabla);
+            return tabla;
+        }
         private List<Emisores_UsuariosEN> CargarDatos(IDataReader pLector)
         {
             List<Emisores_UsuariosEN> listaEmisores_UsuariosEN = new List<Emisores_UsuariosEN>();
             Emisores_UsuariosEN objEmisores_UsuariosEN;
             int colEmisor = pLector.GetOrdinal("EMISOR");
             int colUsuario = pLector.GetOrdinal("USUARIO");
-            int colNombrePerfil = pLector.GetOrdinal("NOMBREPERFIL");
             object[] valores = new object[pLector.FieldCount];
             while (pLector.Read())
             {
@@ -143,7 +157,6 @@ namespace SchoolManager.WhatsApp.AccesoDatos
                 pLector.GetValues(valores);
                 objEmisores_UsuariosEN.EMISOR = Convert.ToString(valores[colEmisor]);
                 objEmisores_UsuariosEN.USUARIO = Convert.ToString(valores[colUsuario]).ToLower();
-                objEmisores_UsuariosEN.NOMBREPERFIL = Convert.ToString(valores[colNombrePerfil]);
                 listaEmisores_UsuariosEN.Add(objEmisores_UsuariosEN);
             }
             return listaEmisores_UsuariosEN;

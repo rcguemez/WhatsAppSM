@@ -44,5 +44,12 @@ namespace SchoolManager.WhatsApp.LogicaNegocios
                 return oContextoAD.Emisores_Usuarios.ObtenerPorUsuario(pUsuario);
             }
         }
+        public static System.Data.DataTable DtEmisorActivoPorUsuario(string pUsuario, int pPrioridad)
+        {
+            using (ContextoAD oContextoAD = new ContextoAD())
+            {
+                return oContextoAD.Emisores_Usuarios.DtEmisorActivoPorUsuario(pUsuario, pPrioridad);
+            }
+        }
     }
 }

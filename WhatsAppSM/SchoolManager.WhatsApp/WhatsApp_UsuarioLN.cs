@@ -88,14 +88,18 @@ namespace SchoolManager.WhatsApp.LogicaNegocios
         }
         public static string[] AgregarEnCola(string pUsuario, string pCodigoPais, string pCelulares, int pRecurso, string pMensaje, int pPrioridad)
         {
-            System.Messaging.MessageQueue mq;
-            if (System.Messaging.MessageQueue.Exists(@".\Private$\whatsapp_" + pUsuario))
+            if (pPrioridad != 1)
             {
-                mq = new System.Messaging.MessageQueue(@".\Private$\whatsapp_" + pUsuario);
+                pPrioridad = 0;
+            }
+            System.Messaging.MessageQueue mq;
+            if (System.Messaging.MessageQueue.Exists(@".\Private$\whatsapp_" + pUsuario + "_" + pPrioridad.ToString()))
+            {
+                mq = new System.Messaging.MessageQueue(@".\Private$\whatsapp_" + pUsuario + "_" + pPrioridad.ToString());
             }
             else
             {
-                mq = System.Messaging.MessageQueue.Create(@".\Private$\whatsapp_" + pUsuario);
+                mq = System.Messaging.MessageQueue.Create(@".\Private$\whatsapp_" + pUsuario + "_" + pPrioridad.ToString());
             }
             System.Messaging.Message msj = new System.Messaging.Message();
             if (pPrioridad == 1)

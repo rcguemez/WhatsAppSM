@@ -17,7 +17,18 @@ namespace WhatsAppSM
         public frmMain()
         {
             InitializeComponent();
-            GetPrivateQueues();
+            List<SchoolManager.WhatsApp.Entidades.UsuariosEN> listaUsuariosEN = SchoolManager.WhatsApp.LogicaNegocios.UsuariosLN.ObtenerTodo();
+            for (int i = 0; i < listaUsuariosEN.Count; i++)
+            {
+                this.listBox1.Items.Add(listaUsuariosEN[i].USUARIO + "_0");
+                listaMLH.Add(new MSMQListenerHelper(listaUsuariosEN[i].USUARIO, 0));
+                listaMLH[listaMLH.Count - 1].FormatterTypes = new Type[] { typeof(string) };
+                listaMLH[listaMLH.Count - 1].MessageReceived += new MessageReceivedEventHandler(MessageReceived);
+                this.listBox1.Items.Add(listaUsuariosEN[i].USUARIO + "_1");
+                listaMLH.Add(new MSMQListenerHelper(listaUsuariosEN[i].USUARIO, 1));
+                listaMLH[listaMLH.Count - 1].FormatterTypes = new Type[] { typeof(string) };
+                listaMLH[listaMLH.Count - 1].MessageReceived += new MessageReceivedEventHandler(MessageReceived);
+            }
         }
         public void GetPrivateQueues()
         {
@@ -26,8 +37,12 @@ namespace WhatsAppSM
             {
                 if (queueItem.QueueName.Contains("whatsapp_"))
                 {
-                    this.listBox1.Items.Add(queueItem.QueueName);
-                    listaMLH.Add(new MSMQListenerHelper(queueItem.QueueName));
+                    this.listBox1.Items.Add(queueItem.QueueName + "_0");
+                    listaMLH.Add(new MSMQListenerHelper(queueItem.QueueName, 0));
+                    listaMLH[listaMLH.Count - 1].FormatterTypes = new Type[] { typeof(string) };
+                    listaMLH[listaMLH.Count - 1].MessageReceived += new MessageReceivedEventHandler(MessageReceived);
+                    this.listBox1.Items.Add(queueItem.QueueName + "_1");
+                    listaMLH.Add(new MSMQListenerHelper(queueItem.QueueName, 1));
                     listaMLH[listaMLH.Count - 1].FormatterTypes = new Type[] { typeof(string) };
                     listaMLH[listaMLH.Count - 1].MessageReceived += new MessageReceivedEventHandler(MessageReceived);
                 }

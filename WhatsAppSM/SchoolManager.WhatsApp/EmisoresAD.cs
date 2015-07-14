@@ -18,14 +18,15 @@ namespace SchoolManager.WhatsApp.AccesoDatos
             {
                 _objContextoAD.Conexion.Open();
             }
-            string sql = "INSERT INTO EMISORES (EMISOR,APIKEY,TIPO,PRIORIDAD,ACTIVO) " +
-                        "VALUES (@EMISOR,@APIKEY,@TIPO,@PRIORIDAD,@ACTIVO)";
+            string sql = "INSERT INTO EMISORES (EMISOR,APIKEY,TIPO,PRIORIDAD,ACTIVO,NOMBREPERFIL) " +
+                        "VALUES (@EMISOR,@APIKEY,@TIPO,@PRIORIDAD,@ACTIVO,@NOMBREPERFIL)";
             FbCommand cmd = new FbCommand(sql, _objContextoAD.Conexion);
             cmd.Parameters.AddWithValue("@EMISOR", pObjEmisoresEN.EMISOR);
             cmd.Parameters.AddWithValue("@APIKEY", pObjEmisoresEN.APIKEY);
             cmd.Parameters.AddWithValue("@TIPO", pObjEmisoresEN.TIPO);
             cmd.Parameters.AddWithValue("@PRIORIDAD", pObjEmisoresEN.PRIORIDAD);
             cmd.Parameters.AddWithValue("@ACTIVO", (pObjEmisoresEN.ACTIVO ? 1 : 0));
+            cmd.Parameters.AddWithValue("@NOMBREPERFIL", pObjEmisoresEN.NOMBREPERFIL);
             try
             {
                 if (_objContextoAD.EsTransaccion)
@@ -55,13 +56,15 @@ namespace SchoolManager.WhatsApp.AccesoDatos
             string sql = "UPDATE EMISORES SET APIKEY = @APIKEY," +
                                                 "TIPO = @TIPO," +
                                                 "PRIORIDAD = @PRIORIDAD," +
-                                                "ACTIVO = ACTIVO " +
+                                                "ACTIVO = @ACTIVO," +
+                                                "NOMBREPERFIL = @NOMBREPERFIL " +
                                                 "WHERE EMISOR = @EMISOR";
             FbCommand cmd = new FbCommand(sql, _objContextoAD.Conexion);
             cmd.Parameters.AddWithValue("@APIKEY", pObjEmisoresEN.APIKEY);
             cmd.Parameters.AddWithValue("@TIPO", pObjEmisoresEN.TIPO);
             cmd.Parameters.AddWithValue("@PRIORIDAD", pObjEmisoresEN.PRIORIDAD);
             cmd.Parameters.AddWithValue("@ACTIVO", (pObjEmisoresEN.ACTIVO ? 1 : 0));
+            cmd.Parameters.AddWithValue("@NOMBREPERFIL", pObjEmisoresEN.NOMBREPERFIL);
             cmd.Parameters.AddWithValue("@EMISOR", pObjEmisoresEN.EMISOR);
             try
             {
@@ -136,6 +139,9 @@ namespace SchoolManager.WhatsApp.AccesoDatos
             int colTipo = pLector.GetOrdinal("TIPO");
             int colPrioridad = pLector.GetOrdinal("PRIORIDAD");
             int colActivo = pLector.GetOrdinal("ACTIVO");
+            int colNombreEmisor = pLector.GetOrdinal("NOMBREPERFIL");
+            int colImagenPerfil = pLector.GetOrdinal("IMAGENPERFIL");
+            int colEstado = pLector.GetOrdinal("ESTADO");
             object[] valores = new object[pLector.FieldCount];
             while (pLector.Read())
             {
@@ -146,6 +152,9 @@ namespace SchoolManager.WhatsApp.AccesoDatos
                 objEmisoresEN.TIPO = Convert.ToInt16(valores[colTipo]);
                 objEmisoresEN.PRIORIDAD = Convert.ToInt16(valores[colPrioridad]);
                 objEmisoresEN.ACTIVO = Convert.ToBoolean(valores[colActivo]);
+                objEmisoresEN.NOMBREPERFIL = Convert.ToString(valores[colNombreEmisor]);
+                objEmisoresEN.IMAGENPERFIL = Convert.ToString(valores[colImagenPerfil]);
+                objEmisoresEN.ESTADO = Convert.ToString(valores[colEstado]);
                 listaEmisoresEN.Add(objEmisoresEN);
             }
             return listaEmisoresEN;

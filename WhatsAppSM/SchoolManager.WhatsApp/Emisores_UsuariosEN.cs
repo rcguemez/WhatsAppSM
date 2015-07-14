@@ -23,11 +23,5 @@ namespace SchoolManager.WhatsApp.Entidades
             get { return _usuario; }
             set { _usuario = value; }
         }
-        private string _nombrePerfil;
-        public string NOMBREPERFIL
-        {
-            get { return _nombrePerfil; }
-            set { _nombrePerfil = value; }
-        }
     }
 }

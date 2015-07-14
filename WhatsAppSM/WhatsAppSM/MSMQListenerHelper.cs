@@ -9,6 +9,7 @@ using WhatsAppApi.Helper;
 using WhatsAppApi.Register;
 using WhatsAppApi.Response;
 using System.IO;
+using System.Data;
 
 namespace WhatsAppSM
 {
@@ -17,8 +18,7 @@ namespace WhatsAppSM
     public class MSMQListenerHelper
     {
         WhatsApp wa;
-        List<SchoolManager.WhatsApp.Entidades.Emisores_UsuariosEN> listaEmisores_UsuariosEN;
-        List<SchoolManager.WhatsApp.Entidades.EmisoresEN> listaEmisoresEN;
+        DataTable dtEmisores_UsuariosEN;
         private bool _listen;
         private Type[] _types;
         private MessageQueue _queue;
@@ -30,38 +30,32 @@ namespace WhatsAppSM
             get { return _types; }
             set { _types = value; }
         }
-        private string _cola;
-        public string Cola
-        {
-            get { return _cola; }
-            set { _cola = value; }
-        }
+        private string _usuario;
         public string Usuario
         {
-            get 
-            {
-                if (_cola.Contains("whatsapp_"))
-                {
-                    return _cola.Substring(_cola.LastIndexOf("_") + 1);
-                }
-                else
-                {
-                    return "";
-                }
-            }
+            get { return _usuario; }
+            set { _usuario = value; }
         }
-
-        public MSMQListenerHelper(string queuePath)
+        private int _prioridad;
+        public int Prioridad
         {
-            _cola = queuePath;
-            if (MessageQueue.Exists(@".\" + queuePath))
+            get { return _prioridad; }
+            set { _prioridad = value; }
+        }
+        
+        public MSMQListenerHelper(string pUsuario, int pPrioridad)
+        {
+            _usuario = pUsuario;
+            _prioridad = pPrioridad;
+            if (MessageQueue.Exists(@".\Private$\whatsapp_" + pUsuario + "_" + pPrioridad.ToString()))
             {
-                _queue = new System.Messaging.MessageQueue(@".\" + queuePath);
+                _queue = new System.Messaging.MessageQueue(@".\Private$\whatsapp_" + pUsuario + "_" + pPrioridad.ToString());
             }
             else
             {
-                _queue = MessageQueue.Create(@".\" + queuePath);
+                _queue = MessageQueue.Create(@".\Private$\whatsapp_" + pUsuario + "_" + pPrioridad.ToString());
             }
+            _queue.MessageReadPropertyFilter.SetAll();
         }
 
         System.Threading.Thread thRecv;
@@ -69,10 +63,14 @@ namespace WhatsAppSM
         DateTime dtUltimaConexion;
         public void Start()
         {
+            dtEmisores_UsuariosEN = SchoolManager.WhatsApp.LogicaNegocios.Emisores_UsuariosLN.DtEmisorActivoPorUsuario(Usuario, _prioridad);
+            if(dtEmisores_UsuariosEN.Rows.Count == 0)
+            {
+                System.Windows.Forms.MessageBox.Show(string.Format("Usuario: {0}.- No hay emisor para enviar mensajes", Usuario));
+                return;
+            }
             _listen = true;
-            listaEmisores_UsuariosEN = SchoolManager.WhatsApp.LogicaNegocios.Emisores_UsuariosLN.ObtenerPorUsuario(Usuario);
-            listaEmisoresEN = SchoolManager.WhatsApp.LogicaNegocios.EmisoresLN.ObtenerPorEmisor(listaEmisores_UsuariosEN[0].EMISOR);
-            wa = new WhatsApp(listaEmisores_UsuariosEN[0].EMISOR, listaEmisoresEN[0].APIKEY, listaEmisores_UsuariosEN[0].NOMBREPERFIL, true);
+            wa = new WhatsApp(dtEmisores_UsuariosEN.Rows[0]["EMISOR"].ToString(), dtEmisores_UsuariosEN.Rows[0]["APIKEY"].ToString(), dtEmisores_UsuariosEN.Rows[0]["NOMBREPERFIL"].ToString(), true);
             dtUltimaConexion = DateTime.Now;
             wa.Connect();
             wa.Login();
@@ -191,39 +189,53 @@ namespace WhatsAppSM
                 folio = strArr[0];
                 receptor = strArr[1];
                 recurso = strArr[2];
-
-                SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusListoParaEnviar(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "");
-                //wa.SendMessage(receptor, e.Message.Body.ToString());
-
+                bool nuevaConexion = false;
+            volver_conectar:
                 try
                 {
+                    SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusListoParaEnviar(Usuario, dtEmisores_UsuariosEN.Rows[0]["EMISOR"].ToString(), folio, "");
                     WhatsUserManager usrMan = new WhatsUserManager();
                     var tmpUser = usrMan.CreateUser(receptor, "User" + receptor);
                     WhatsAppApi.Parser.FMessage.FMessageIdentifierKey key = new WhatsAppApi.Parser.FMessage.FMessageIdentifierKey(tmpUser.GetFullJid(), true, folio);
                     WhatsAppApi.Parser.FMessage msj = new WhatsAppApi.Parser.FMessage(key);
                     msj.data = e.Message.Body.ToString();
-                    if(dtUltimaConexion.AddMinutes(1) < DateTime.Now)
+                    if (dtUltimaConexion.AddMinutes(1) < DateTime.Now | nuevaConexion)
                     {
                         wa.Connect();
                         wa.Login();
                     }
                     dtUltimaConexion = DateTime.Now;
-                    if (wa.ConnectionStatus == ApiBase.CONNECTION_STATUS.UNAUTHORIZED)
+                    if (wa.ConnectionStatus == ApiBase.CONNECTION_STATUS.CONNECTED | wa.ConnectionStatus == ApiBase.CONNECTION_STATUS.DISCONNECTED)
                     {
-                        SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusErrorEnvio(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "No Autorizado para enviar");
+                        wa.Connect();
+                        wa.Login();
+                    }
+                    else if (wa.ConnectionStatus == ApiBase.CONNECTION_STATUS.UNAUTHORIZED)
+                    {
+                        SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusErrorEnvio(Usuario, dtEmisores_UsuariosEN.Rows[0]["EMISOR"].ToString(), folio, "No Autorizado para enviar");
                         this.Stop();
                         return;
                     }
                     wa.SendMessage(msj);
                     Random objRandom = new Random();
-                    System.Threading.Thread.Sleep(objRandom.Next(1000, 1500));
+                    System.Threading.Thread.Sleep(objRandom.Next(2000, 3000));
                 }
                 catch (Exception ex)
                 {
-                    SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusErrorEnvio(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "Error al enviar: " + ex.Message);
-                    return;
+                    if (ex.Message == "Se ha anulado una conexión establecida por el software en su equipo host")
+                    {
+                        nuevaConexion = true;
+                        wa.Disconnect();
+                        System.Threading.Thread.Sleep(5000);
+                        goto volver_conectar;
+                    }
+                    else
+                    {
+                        SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusErrorEnvio(Usuario, dtEmisores_UsuariosEN.Rows[0]["EMISOR"].ToString(), folio, "Error al enviar: " + ex.Message);
+                        return;
+                    }
                 }
-                SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusEnviando(Usuario, listaEmisores_UsuariosEN[0].EMISOR, folio, "");
+                SchoolManager.WhatsApp.LogicaNegocios.WhatsApp_UsuarioLN.PonerStatusEnviando(Usuario, dtEmisores_UsuariosEN.Rows[0]["EMISOR"].ToString(), folio, "");
                 StartListening();
             }
             catch(Exception ex)
