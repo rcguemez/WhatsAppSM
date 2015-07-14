@@ -58,6 +58,7 @@
     <Compile Include="frmMain.Designer.cs">
       <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="MSMQListenerHelperConStatus.cs" />
     <Compile Include="MSMQListenerHelper2.cs" />
     <Compile Include="MSMQListenerHelper.cs" />
     <Compile Include="Program.cs" />

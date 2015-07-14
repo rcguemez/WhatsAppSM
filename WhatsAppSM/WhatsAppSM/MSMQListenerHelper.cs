@@ -10,6 +10,7 @@ using WhatsAppApi.Register;
 using WhatsAppApi.Response;
 using System.IO;
 using System.Data;
+using System.Net;
 
 namespace WhatsAppSM
 {
@@ -74,37 +75,7 @@ namespace WhatsAppSM
             dtUltimaConexion = DateTime.Now;
             wa.Connect();
             wa.Login();
-            //string datFile = getDatFileName(listaEmisores_UsuariosEN[0].EMISOR);
-            //if (File.Exists(datFile))
-            //{
-            //    try
-            //    {
-            //        string foo = File.ReadAllText(datFile);
-            //        nextChallenge = Convert.FromBase64String(foo);
-            //    }
-            //    catch (Exception) { };
-            //}
-            //wa.Login(nextChallenge);
-            //wa.SendGetServerProperties();
-
-            //thRecv = new System.Threading.Thread(t =>
-            //{
-            //    try
-            //    {
-            //        while (wa != null)
-            //        {
-            //            wa.PollMessages();
-            //            System.Threading.Thread.Sleep(100);
-            //            continue;
-            //        }
-
-            //    }
-            //    catch (System.Threading.ThreadAbortException)
-            //    {
-            //    }
-            //}) { IsBackground = true };
-            //thRecv.Start();
-
+            
             if (_types != null && _types.Length > 0)
             {
                 // Using only the XmlMessageFormatter. You can use other formatters as well
@@ -121,9 +92,9 @@ namespace WhatsAppSM
         {
             _listen = false;
             wa.Disconnect();
+
             _queue.PeekCompleted -= new PeekCompletedEventHandler(OnPeekCompleted);
             _queue.ReceiveCompleted -= new ReceiveCompletedEventHandler(OnReceiveCompleted);
-
         }
 
         private void StartListening()
@@ -250,7 +221,6 @@ namespace WhatsAppSM
             string filename = string.Format("{0}.next.dat", pn);
             return Path.Combine(Directory.GetCurrentDirectory(), filename);
         }
-
     }
 
     public class MessageEventArgs : EventArgs

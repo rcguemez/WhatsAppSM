@@ -201,7 +201,9 @@ namespace SchoolManager.WhatsApp.AccesoDatos
             }
             string sql = "UPDATE WHATSAPP_" + pUsuario.ToLower() + " SET STATUS = @STATUS," +
                                                 "OBSERVACIONES = @OBSERVACIONES," +
-                                                "FECHAHORALEIDO = CURRENT_TIMESTAMP " +
+                                                "FECHAHORALEIDO = CURRENT_TIMESTAMP," +
+                                                "FECHAHORAENVIADO = CASE WHEN FECHAHORAENVIADO IS NULL THEN CURRENT_TIMESTAMP ELSE FECHAHORAENVIADO END," +
+                                                "FECHAHORAENTREGADO = CASE WHEN FECHAHORAENTREGADO IS NULL THEN CURRENT_TIMESTAMP ELSE FECHAHORAENTREGADO END " +
                                                 "WHERE FOLIO = @FOLIO";
             FbCommand cmd = new FbCommand(sql, _objContextoAD.Conexion);
             cmd.Parameters.AddWithValue("@STATUS", 5);
