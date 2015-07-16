@@ -20,10 +20,9 @@ namespace MSMQ
         {
             InitializeComponent();
             List<SchoolManager.WhatsApp.Entidades.UsuariosEN> listaUsuariosEN = SchoolManager.WhatsApp.LogicaNegocios.UsuariosLN.ObtenerTodo();
-            for (int i = 0; i < listaUsuariosEN.Count; i++)
-            {
-                this.cmbUsuarios.Items.Add(listaUsuariosEN[i].USUARIO);
-            }
+            this.cmbUsuarios.DataSource = SchoolManager.WhatsApp.LogicaNegocios.UsuariosLN.ObtenerTodo();
+            this.cmbUsuarios.DisplayMember = "USUARIO";
+            this.cmbUsuarios.ValueMember = "PASS";
             if (listaUsuariosEN.Count > 0)
             {
                 this.cmbUsuarios.SelectedIndex = 0;
@@ -50,7 +49,7 @@ namespace MSMQ
         private void btnEnviar_Click(object sender, EventArgs e)
         {
             this.txtRespuesta.Text = "";
-            Mensajes objMensaje = new Mensajes() { Usuario = this.cmbUsuarios.Text, Password = "1234", CodigoPais = "521", Celular = this.txtCelular.Text, Mensaje = this.txtMensaje.Text, Prioridad = this.cmbTipo.SelectedIndex };
+            Mensajes objMensaje = new Mensajes() { Usuario = this.cmbUsuarios.Text, Password = this.cmbUsuarios.SelectedValue.ToString(), CodigoPais = "521", Celular = this.txtCelular.Text, Mensaje = this.txtMensaje.Text, Prioridad = this.cmbTipo.SelectedIndex };
             RunAsync(objMensaje).Wait(100);
         }
 
@@ -106,7 +105,7 @@ namespace MSMQ
         private void btnEnviarASMX_Click(object sender, EventArgs e)
         {
             this.txtRespuesta.Text = "";
-            SchoolManager.WhatsApp.ServiciosWeb.WS_Mensajes.Mensajes objMensaje = new SchoolManager.WhatsApp.ServiciosWeb.WS_Mensajes.Mensajes() { Usuario = this.cmbUsuarios.Text, Password = "1234", CodigoPais = "521", Celular = this.txtCelular.Text, Mensaje = this.txtMensaje.Text, Prioridad = this.cmbTipo.SelectedIndex };
+            SchoolManager.WhatsApp.ServiciosWeb.WS_Mensajes.Mensajes objMensaje = new SchoolManager.WhatsApp.ServiciosWeb.WS_Mensajes.Mensajes() { Usuario = this.cmbUsuarios.Text, Password = this.cmbUsuarios.SelectedValue.ToString(), CodigoPais = "521", Celular = this.txtCelular.Text, Mensaje = this.txtMensaje.Text, Prioridad = this.cmbTipo.SelectedIndex };
             string mensaje = objMensaje.Mensaje;
             for (int i = 1; i <= numMensajes.Value; i++)
             {
