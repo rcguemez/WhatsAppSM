@@ -144,6 +144,22 @@ namespace SchoolManager.WhatsApp.AccesoDatos
             adapter.Fill(tabla);
             return tabla;
         }
+        public DataTable DtActivos()
+        {
+            DataTable tabla = new DataTable();
+            if (_objContextoAD.Conexion.State == ConnectionState.Closed)
+            {
+                _objContextoAD.Conexion.Open();
+            }
+            string sql = "SELECT EU.EMISOR,EU.USUARIO,E.PRIORIDAD FROM EMISORES_USUARIOS EU INNER JOIN EMISORES E ON EU.EMISOR = E.EMISOR WHERE E.ACTIVO = 1 ORDER BY EU.USUARIO, E.PRIORIDAD";
+            FbDataAdapter adapter = new FbDataAdapter(sql, _objContextoAD.Conexion);
+            if (_objContextoAD.EsTransaccion)
+            {
+                adapter.SelectCommand.Transaction = _objContextoAD.Transaccion;
+            }
+            adapter.Fill(tabla);
+            return tabla;
+        }
         private List<Emisores_UsuariosEN> CargarDatos(IDataReader pLector)
         {
             List<Emisores_UsuariosEN> listaEmisores_UsuariosEN = new List<Emisores_UsuariosEN>();

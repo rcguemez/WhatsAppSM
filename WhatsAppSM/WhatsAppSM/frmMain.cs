@@ -17,15 +17,11 @@ namespace WhatsAppSM
         public frmMain()
         {
             InitializeComponent();
-            List<SchoolManager.WhatsApp.Entidades.UsuariosEN> listaUsuariosEN = SchoolManager.WhatsApp.LogicaNegocios.UsuariosLN.ObtenerTodo();
-            for (int i = 0; i < listaUsuariosEN.Count; i++)
+            DataTable dtUsuariosEN = SchoolManager.WhatsApp.LogicaNegocios.Emisores_UsuariosLN.DtActivos();
+            foreach (DataRow fila in dtUsuariosEN.Rows)
             {
-                this.listBox1.Items.Add(listaUsuariosEN[i].USUARIO + "_0");
-                listaMLH.Add(new MSMQListenerHelper(listaUsuariosEN[i].USUARIO, 0));
-                listaMLH[listaMLH.Count - 1].FormatterTypes = new Type[] { typeof(string) };
-                listaMLH[listaMLH.Count - 1].MessageReceived += new MessageReceivedEventHandler(MessageReceived);
-                this.listBox1.Items.Add(listaUsuariosEN[i].USUARIO + "_1");
-                listaMLH.Add(new MSMQListenerHelper(listaUsuariosEN[i].USUARIO, 1));
+                this.listBox1.Items.Add(fila["USUARIO"].ToString() + "_" + fila["PRIORIDAD"].ToString());
+                listaMLH.Add(new MSMQListenerHelper(fila["USUARIO"].ToString(), Convert.ToInt32(fila["PRIORIDAD"])));
                 listaMLH[listaMLH.Count - 1].FormatterTypes = new Type[] { typeof(string) };
                 listaMLH[listaMLH.Count - 1].MessageReceived += new MessageReceivedEventHandler(MessageReceived);
             }
