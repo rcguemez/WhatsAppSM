@@ -89,6 +89,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\REFERENCIAS\es\System.Net.Http.Formatting.resources.dll" />
+    <Content Include="bin\Debug\REFERENCIAS\Newtonsoft.Json.dll" />
+    <Content Include="bin\Debug\REFERENCIAS\System.Net.Http.Formatting.dll" />
+    <Content Include="bin\Debug\REFERENCIAS\WhatsAppApi.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
